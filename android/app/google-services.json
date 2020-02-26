@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "935836552885",
+    "firebase_url": "https://inventory-management-5a8a0.firebaseio.com",
+    "project_id": "inventory-management-5a8a0",
+    "storage_bucket": "inventory-management-5a8a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935836552885:android:54c45cd331003e515278fc",
+        "android_client_info": {
+          "package_name": "com.naung9.inventory"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935836552885-u0j5gr1npumffd9jica6rtattf16m4g9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7Cbnk1QI-BpH9McMIV_2RsKlWbip7X0g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935836552885-u0j5gr1npumffd9jica6rtattf16m4g9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
