@@ -15,19 +15,14 @@ export default class Items extends React.Component {
       .onSnapshot(snapshot => {
         if (snapshot !== null) {
           let data = [];
-          let showItems = [];
           snapshot.forEach(doc => {
             let item = doc.data();
             item.id = doc.id;
             data.push(item);
-            showItems.push(doc.id);
           });
           this.setState({
             items: data,
-            showItems:
-              this.state.showItems.length === 0
-                ? showItems
-                : this.state.showItems
+            showItems: data
           });
         }
       });
@@ -42,13 +37,12 @@ export default class Items extends React.Component {
     query = query.toLowerCase();
     this.setState({
       items: currentItems,
-      showItems: currentItems
-        .filter(
-          item =>
-            item.name.toLowerCase().indexOf(query) !== -1 ||
-            item.type.toLowerCase().indexOf(query) !== -1
-        )
-        .map(item => item.id)
+      showItems: currentItems.filter(
+        item =>
+          item.name.toLowerCase().indexOf(query) !== -1 ||
+          item.type.toLowerCase().indexOf(query) !== -1 ||
+          item.currentOwner.name.toLowerCase().indexOf(query) !== -1
+      )
     });
   }
 
@@ -61,7 +55,7 @@ export default class Items extends React.Component {
           onChangeText={this.filterItems}
         />
         <FlatList
-          data={this.state.items}
+          data={this.state.showItems}
           keyExtractor={item => item.id}
           renderItem={({ item }) => {
             return <ItemListItem {...this.props} item={item} />;

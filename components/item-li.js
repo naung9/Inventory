@@ -17,6 +17,8 @@ export default class ItemListItem extends React.Component {
     this.fileStore = props.fileStore;
     this.state = { imageUrl: "", menuVisible: false };
     this.hideMenu = this.hideMenu.bind(this);
+    this.user = props.user.storeUser;
+    this.disabledStatuses = ["rented", "lost", "pending"];
   }
 
   componentDidMount(): void {
@@ -38,7 +40,9 @@ export default class ItemListItem extends React.Component {
         <Card>
           <Card.Title
             title={this.props.item.name}
-            subtitle={"Type : " + this.props.item.type}
+            subtitle={`At : ${this.props.item.currentOwner.name}, Type : ${
+              this.props.item.type
+            }`}
             left={props => <Text>{"Qty : " + this.props.item.quantity}</Text>}
             right={props => (
               <Image
@@ -52,59 +56,81 @@ export default class ItemListItem extends React.Component {
             )}
           />
           <Card.Actions styles={styles.cardFooter}>
-            <Menu
-              visible={this.state.menuVisible}
-              onDismiss={this.hideMenu}
-              anchor={
-                <Button
-                  onPress={() =>
-                    this.setState({
-                      imageUrl: this.state.imageUrl,
-                      menuVisible: true
-                    })
+            {this.props.item.currentOwner.email !== this.user.email &&
+            this.disabledStatuses.indexOf(this.props.item.status) === -1 ? (
+              <>
+                <Button>Rent One</Button>
+                <View style={styles.verticalDivider} />
+              </>
+            ) : (
+              <></>
+            )}
+            {this.props.item.currentOwner.email !== this.user.email ? (
+              <>
+                <Menu
+                  visible={this.state.menuVisible}
+                  onDismiss={this.hideMenu}
+                  anchor={
+                    <Button
+                      onPress={() =>
+                        this.setState({
+                          imageUrl: this.state.imageUrl,
+                          menuVisible: true
+                        })
+                      }
+                    >
+                      Contact
+                    </Button>
                   }
                 >
-                  Contact Owner
-                </Button>
-              }
-            >
-              <Menu.Item
-                title={"Send Email"}
-                onPress={() => {
-                  this.hideMenu();
-                  Linking.openURL(
-                    "mailto:" + this.props.item.currentOwner.email
-                  );
-                }}
-              />
-              <Menu.Item
-                title={"Call Phone"}
-                onPress={() => {
-                  this.hideMenu();
-                  Linking.openURL(
-                    `tel:${this.props.item.currentOwner.phoneNo}`
-                  );
-                }}
-              />
-              <Menu.Item
-                title={"Send SMS"}
-                onPress={() => {
-                  this.hideMenu();
-                  Linking.openURL(
-                    "sms:" + this.props.item.currentOwner.phoneNo
-                  );
-                }}
-              />
-            </Menu>
+                  <Menu.Item
+                    title={"Send Email"}
+                    onPress={() => {
+                      this.hideMenu();
+                      Linking.openURL(
+                        "mailto:" + this.props.item.currentOwner.email
+                      );
+                    }}
+                  />
+                  <Menu.Item
+                    title={"Call Phone"}
+                    onPress={() => {
+                      this.hideMenu();
+                      Linking.openURL(
+                        `tel:${this.props.item.currentOwner.phoneNo}`
+                      );
+                    }}
+                  />
+                  <Menu.Item
+                    title={"Send SMS"}
+                    onPress={() => {
+                      this.hideMenu();
+                      Linking.openURL(
+                        "sms:" + this.props.item.currentOwner.phoneNo
+                      );
+                    }}
+                  />
+                </Menu>
 
-            <View style={styles.verticalDivider} />
+                <View style={styles.verticalDivider} />
+              </>
+            ) : (
+              <></>
+            )}
+
             <Button
               onPress={() => {
-                console.log(this.props.item);
-                this.props.navigation.navigate("ItemDetail", {
-                  item: this.props.item
-                  // storageService: this.props.storageService
-                });
+                if (this.user.email === this.props.item.currentOwner.email)
+                  this.props.navigation.navigate("ItemDetail", {
+                    item: this.props.item
+                    // storageService: this.props.storageService
+                  });
+                else {
+                  this.props.navigation.navigate("ItemDetailAction", {
+                    item: this.props.item
+                    // storageService: this.props.storageService
+                  });
+                }
               }}
             >
               Details

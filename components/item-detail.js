@@ -245,7 +245,7 @@ export default class ItemDetail extends React.Component {
             ref={this.status}
             onValueChange={this.onSelectItemChange}
           >
-            <Picker.Item label={"Good Condition"} value={"good"} />
+            <Picker.Item label={"Available"} value={"good"} />
             <Picker.Item label={"Damaged"} value={"damaged"} />
             <Picker.Item label={"Lost"} value={"lost"} />
           </Picker>

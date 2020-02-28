@@ -5,9 +5,9 @@ import {
   CheckBox,
   StyleSheet,
   Platform,
-  Button,
   ActivityIndicator
 } from "react-native";
+import { Button } from "react-native-paper";
 import { OutlinedTextField } from "react-native-material-textfield";
 
 export class Login extends React.Component {
@@ -57,7 +57,12 @@ export class Login extends React.Component {
           ref={this.passwordRef}
           secureTextEntry={true}
         />
-        <Button title={"Login"} onPress={this.doLogin} text={"LOGIN"} />
+        <Button mode={"contained"} onPress={this.doLogin}>
+          Login
+        </Button>
+        <Button onPress={() => this.props.navigation.navigate("Register")}>
+          Register
+        </Button>
       </View>
     );
     if (this.state.loading) {

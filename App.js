@@ -12,13 +12,20 @@ import { Platform } from "react-native";
 import { Login } from "./components/login";
 import auth from "@react-native-firebase/auth";
 import { Home } from "./components/home";
-import { Appbar, Provider as PaperProvider, Menu } from "react-native-paper";
+import {
+  Appbar,
+  Provider as PaperProvider,
+  Menu,
+  ActivityIndicator
+} from "react-native-paper";
 import { FireStoreService } from "./services/FireStoreService";
 import { createStackNavigator } from "@react-navigation/stack";
 import firestore from "@react-native-firebase/firestore";
 import ItemDetail from "./components/item-detail";
 import storage from "@react-native-firebase/storage";
 import UserProfile from "./components/user-profile";
+import ItemDetailAction from "./components/item-detail-action";
+import { Register } from "./components/register";
 
 // TODO(you): import any additional firebase services that you require for your app, e.g for auth:
 //    1) install the npm package: `yarn add @react-native-firebase/auth@alpha` - you do not need to
@@ -48,6 +55,7 @@ class MyHeader extends React.Component {
     this.scene = props.scene;
     this.navigation = props.navigation;
     this.auth = props.auth;
+    this.user = props.user.storeUser;
     this.showMenu = this.showMenu.bind(this);
     this.onMenuDismiss = this.onMenuDismiss.bind(this);
     this.logOut = this.logOut.bind(this);
@@ -87,7 +95,7 @@ class MyHeader extends React.Component {
         >
           <Menu.Item
             icon="check"
-            title="My Profile"
+            title={"My Profile"}
             onPress={() => {
               this.onMenuDismiss();
               this.navigation.navigate("UserProfile");
@@ -105,7 +113,8 @@ export default class App extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      user: null
+      user: null,
+      loading: false
     };
     this.auth = auth();
     this.fireStore = firestore();
@@ -116,25 +125,31 @@ export default class App extends Component<Props> {
     console.log("App Started");
     this.authUnSubscriber = this.auth.onAuthStateChanged(user => {
       console.log("Auth State Changed", user);
+      this.state.loading = true;
+      this.setState(this.state);
       if (user !== null) {
         this.storageService
           .getCollection("users")
-          .get({ email: user.email })
+          .where("email", "==", user.email)
+          .get()
           .then(
             snapshot => {
               console.log(snapshot);
               let usr =
                 snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
               if (usr !== null) {
-                console.log(usr);
                 usr.id = snapshot.docs[0].id;
-                this.setState({ user: { authUser: user, storeUser: usr } });
+                console.log(usr);
+                this.setState({
+                  user: { authUser: user, storeUser: usr },
+                  loading: false
+                });
               }
             },
-            error => console.log(error)
+            error => this.setState({ user: null, loading: false })
           );
       } else {
-        this.setState({ user: null });
+        this.setState({ user: null, loading: false });
       }
     });
   }
@@ -145,56 +160,89 @@ export default class App extends Component<Props> {
   }
 
   render() {
-    if (!this.state.user) return <Login auth={this.auth} />;
+    if (this.state.loading) return <ActivityIndicator />;
     return (
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName={"Home"}
-            headerMode={"screen"}
-            screenOptions={{
-              header: ({ scene, previous, navigation }) => (
-                <MyHeader
-                  scene={scene}
-                  previous={previous}
-                  navigation={navigation}
-                  auth={this.auth}
-                  user={this.state.user}
-                />
-              )
-            }}
-          >
-            <Stack.Screen name={"Home"}>
-              {props => (
-                <Home
-                  {...props}
-                  storageService={this.storageService}
-                  fileStore={this.fileStore}
-                  user={this.state.user}
-                />
-              )}
-            </Stack.Screen>
-            <Stack.Screen name={"ItemDetail"}>
-              {props => (
-                <ItemDetail
-                  {...props}
-                  storageService={this.storageService}
-                  fileStore={this.fileStore}
-                  user={this.state.user}
-                />
-              )}
-            </Stack.Screen>
-            <Stack.Screen name={"UserProfile"}>
-              {props => (
-                <UserProfile
-                  {...props}
-                  storageService={this.storageService}
-                  fileStore={this.fileStore}
-                  user={this.state.user}
-                />
-              )}
-            </Stack.Screen>
-          </Stack.Navigator>
+          {this.state.user ? (
+            <Stack.Navigator
+              initialRouteName={"Home"}
+              headerMode={"screen"}
+              screenOptions={{
+                header: ({ scene, previous, navigation }) => (
+                  <MyHeader
+                    scene={scene}
+                    previous={previous}
+                    navigation={navigation}
+                    auth={this.auth}
+                    user={this.state.user}
+                  />
+                )
+              }}
+            >
+              <Stack.Screen name={"Home"}>
+                {props => (
+                  <Home
+                    {...props}
+                    storageService={this.storageService}
+                    fileStore={this.fileStore}
+                    user={this.state.user}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name={"ItemDetail"}>
+                {props => (
+                  <ItemDetail
+                    {...props}
+                    storageService={this.storageService}
+                    fileStore={this.fileStore}
+                    user={this.state.user}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name={"ItemDetailAction"}>
+                {props => (
+                  <ItemDetailAction
+                    {...props}
+                    storageService={this.storageService}
+                    fileStore={this.fileStore}
+                    user={this.state.user}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name={"UserProfile"}>
+                {props => (
+                  <UserProfile
+                    {...props}
+                    storageService={this.storageService}
+                    fileStore={this.fileStore}
+                    user={this.state.user}
+                  />
+                )}
+              </Stack.Screen>
+            </Stack.Navigator>
+          ) : (
+            <Stack.Navigator
+              initialRouteName={"Login"}
+              screenOptions={{
+                headerShown: false
+              }}
+            >
+              <Stack.Screen name={"Login"}>
+                {props => <Login {...props} auth={this.auth} />}
+              </Stack.Screen>
+              <Stack.Screen name={"Register"}>
+                {props => (
+                  <Register
+                    {...props}
+                    storageService={this.storageService}
+                    fileStore={this.fileStore}
+                    auth={this.auth}
+                  />
+                )}
+              </Stack.Screen>
+            </Stack.Navigator>
+          )}
         </NavigationContainer>
       </PaperProvider>
     );

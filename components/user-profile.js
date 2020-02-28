@@ -22,7 +22,8 @@ export default class UserProfile extends React.Component {
       () => {
         this.props.storageService
           .getCollection("items")
-          .get({ currentOwner: { email: this.user.email } })
+          .where("currentOwner.email", "==", this.user.email)
+          .get()
           .then(
             snapshot => {
               snapshot.forEach(doc => {
@@ -96,6 +97,7 @@ export default class UserProfile extends React.Component {
             <Button
               mode={"contained"}
               icon={"floppy"}
+              compact={true}
               onPress={this.updateProfile}
             >
               Update
