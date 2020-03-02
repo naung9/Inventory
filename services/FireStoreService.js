@@ -37,13 +37,15 @@ export class FireStoreService {
   async addItem(itemType, item) {
     return await this.getCollection(itemType).add(item);
   }
-  async saveItem(itemType, item) {
-    return await this.getCollection(itemType)
+  saveItem(itemType, item) {
+    return this.getCollection(itemType)
       .doc(item.id)
       .update(item);
   }
-  async deleteItem(itemType, id) {
-    return await this.getItemById(itemType, id).delete();
+  deleteItem(itemType, id) {
+    return this.getCollection(itemType)
+      .doc(id)
+      .delete();
   }
   async searchItems(itemType, searchParams, pagination?: Pagination) {}
 }

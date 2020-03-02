@@ -4,7 +4,9 @@ import {
   Text,
   Button,
   TouchableRipple,
-  ActivityIndicator
+  ActivityIndicator,
+  Card,
+  Title
 } from "react-native-paper";
 import { OutlinedTextField } from "react-native-material-textfield";
 import ImagePicker from "react-native-image-picker";
@@ -25,6 +27,7 @@ export default class ItemDetail extends React.Component {
     this.delete = this.delete.bind(this);
     this.add = this.add.bind(this);
     this.prepareToSave = this.prepareToSave.bind(this);
+    this.processRequest = this.processRequest.bind(this);
     try {
       this.item = props.route.params.item;
     } catch (error) {
@@ -41,12 +44,41 @@ export default class ItemDetail extends React.Component {
       item: this.item,
       updated: false,
       loading: false,
-      pickedValue: "good"
+      pickedValue: "good",
+      itemRequests: []
     };
   }
 
   componentDidMount(): void {
+    this.unSubscriber = () => {};
     if (this.item !== null) {
+      this.unSubscriber = this.storageService
+        .getCollection("item_requests")
+        .where("itemId", "==", this.item.id)
+        .onSnapshot(snapshot => {
+          if (snapshot !== null) {
+            let data = [];
+            snapshot.forEach(doc => {
+              let request = doc.data();
+              request.id = doc.id;
+              data.push(request);
+            });
+            this.state.itemRequests = data;
+            this.setState(this.state);
+          }
+        });
+      this.imageStoreRef = this.fileStore.ref("items/" + this.item.imageName);
+      this.imageStoreRef.getDownloadURL().then(
+        value => {
+          this.state.imageUrl = value;
+          this.setState(this.state);
+        },
+        error => {
+          console.log(error);
+          this.state.loading = false;
+          this.setState(this.state);
+        }
+      );
       this.imageStoreRef = this.fileStore.ref(
         storagePath + this.item.imageName
       );
@@ -70,6 +102,11 @@ export default class ItemDetail extends React.Component {
       );
     }
   }
+
+  componentWillUnmount(): void {
+    this.unSubscriber();
+  }
+
   prepareToSave(item, callback = result => console.log(result)) {
     this.state.loading = true;
     item.name = this.itemName.current.value();
@@ -183,6 +220,27 @@ export default class ItemDetail extends React.Component {
     this.setState(this.state);
   }
 
+  processRequest(itemRequest, status) {
+    this.state.loading = true;
+    this.setState(this.state);
+    if (itemRequest.returnStatus !== null) {
+      itemRequest.returnStatus = status;
+    } else {
+      itemRequest.requestStatus = status;
+    }
+    this.storageService.saveItem("item_requests", itemRequest).then(
+      result => {
+        console.log("Saved Result : ", result);
+        this.state.loading = false;
+        this.setState(this.state);
+      },
+      error => {
+        this.state.loading = false;
+        this.setState(this.state);
+      }
+    );
+  }
+
   render() {
     let scrollItems = [];
     if (this.item !== null && this.item.previousOwners !== undefined) {
@@ -196,6 +254,60 @@ export default class ItemDetail extends React.Component {
         <Text>{"Current Owner : " + this.item.currentOwner.name}</Text>
       );
     }
+    let requestInfoViews = [];
+    this.state.itemRequests.forEach(request => {
+      if (
+        request.requestStatus !== "denied" &&
+        (request.returnStatus === null || request.returnStatus === "pending")
+      ) {
+        requestInfoViews.push(
+          <View key={request.id} style={{ marginBottom: 2 }}>
+            <Card>
+              <Card.Title
+                title={
+                  request.returnStatus !== null
+                    ? `Return By ${request.requestBy.name}`
+                    : `Request By ${request.requestBy.name}`
+                }
+                subtitle={
+                  request.returnStatus !== null
+                    ? request.returnStatus
+                    : request.requestStatus
+                }
+                right={props => (
+                  <View style={{ marginRight: 5 }}>
+                    <Text>{"Qty : " + request.quantity}</Text>
+                  </View>
+                )}
+              />
+              <Card.Actions>
+                <View style={styles.buttonRow}>
+                  {request.requestStatus === "pending" ||
+                  request.returnStatus === "pending" ? (
+                    <>
+                      <Button
+                        onPress={() => this.processRequest(request, "approved")}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        onPress={() => this.processRequest(request, "denied")}
+                      >
+                        Deny
+                      </Button>
+                    </>
+                  ) : null}
+                  {request.requestStatus === "approved" &&
+                  request.returnStatus === null ? (
+                    <Button>Notify Return</Button>
+                  ) : null}
+                </View>
+              </Card.Actions>
+            </Card>
+          </View>
+        );
+      }
+    });
     if (this.state.loading)
       return (
         <View style={styles.container}>
@@ -203,7 +315,7 @@ export default class ItemDetail extends React.Component {
         </View>
       );
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.content}>
           <TouchableRipple onPress={this.pickImage}>
             {this.state.imageUrl === "" ? (
@@ -266,12 +378,14 @@ export default class ItemDetail extends React.Component {
               {"Cancel"}
             </Button>
           </View>
+          <Title>Requests</Title>
+          {requestInfoViews}
         </View>
         <View style={styles.owners}>
           {currentOwner}
-          <ScrollView>{scrollItems}</ScrollView>
+          {scrollItems}
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -295,7 +409,7 @@ const styles = StyleSheet.create({
   },
   image: {
     flexWrap: "wrap",
-    height: 200,
+    minHeight: 200,
     minWidth: 200,
     borderColor: "black",
     borderRadius: 2,

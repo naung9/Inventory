@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Image, Linking } from "react-native";
+import { StyleSheet, View, Image, Linking, Share } from "react-native";
 import {
   Card,
   TouchableRipple,
@@ -40,7 +40,7 @@ export default class ItemListItem extends React.Component {
         <Card>
           <Card.Title
             title={this.props.item.name}
-            subtitle={`At : ${this.props.item.currentOwner.name}, Type : ${
+            subtitle={`Owner : ${this.props.item.currentOwner.name}, Type : ${
               this.props.item.type
             }`}
             left={props => <Text>{"Qty : " + this.props.item.quantity}</Text>}
@@ -56,15 +56,19 @@ export default class ItemListItem extends React.Component {
             )}
           />
           <Card.Actions styles={styles.cardFooter}>
-            {this.props.item.currentOwner.email !== this.user.email &&
-            this.disabledStatuses.indexOf(this.props.item.status) === -1 ? (
-              <>
-                <Button>Rent One</Button>
-                <View style={styles.verticalDivider} />
-              </>
-            ) : (
-              <></>
-            )}
+            {/*{this.props.item.currentOwner.email !== this.user.email &&*/}
+            {/*this.disabledStatuses.indexOf(this.props.item.status) === -1 ? (*/}
+            {/*  <>*/}
+            {/*    <Button onPress={()=>{*/}
+            {/*      Share.share({*/}
+            {/*        message: `Item : ${this.props.item.name}\n, Quantity: 1`*/}
+            {/*      })*/}
+            {/*    }}>Share</Button>*/}
+            {/*    <View style={styles.verticalDivider} />*/}
+            {/*  </>*/}
+            {/*) : (*/}
+            {/*  <></>*/}
+            {/*)}*/}
             {this.props.item.currentOwner.email !== this.user.email ? (
               <>
                 <Menu
