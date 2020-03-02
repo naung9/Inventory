@@ -29,6 +29,7 @@ export default class UserProfile extends React.Component {
               snapshot.forEach(doc => {
                 let item = doc.data();
                 item.currentOwner = this.user;
+                item.id = doc.id;
                 this.props.storageService
                   .saveItem("items", item)
                   .then(
