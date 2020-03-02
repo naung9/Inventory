@@ -16,3 +16,13 @@ Hobby project that use React Native and Google Firebase for simple Inventory tra
 - Node Js, NPM/Yarn
 - EMCA Script Version ^6 Knowledge. (ES6 ++)
 
+## Features
+- [x] No server side code. Firebase is awesome
+- [x] Cross Platform. (IOS / Android)
+- [x] Code can be easily converted to Web version later. // Power of Javascript and React
+- [x] Authentication and Registration
+- [x] Adding, Editing your inventory items
+- [x] Search other people's belongings and request for rent if you need
+- [x] Approve/Deny to people's requests for your items
+- [ ] Item rent history. (Not Yet Implemented)
+- [ ] Notifications. (Not yet Implemented. See [Issue](https://github.com/naung9/Inventory/issues/1)
