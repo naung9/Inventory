@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  CheckBox,
-  StyleSheet,
-  Platform,
-  ActivityIndicator
-} from "react-native";
-import { Button } from "react-native-paper";
+import { View, StyleSheet, Platform, ActivityIndicator } from "react-native";
+import { Button, Snackbar } from "react-native-paper";
 import { OutlinedTextField } from "react-native-material-textfield";
 
 export class Login extends React.Component {
@@ -17,7 +10,8 @@ export class Login extends React.Component {
     this.emailRef = React.createRef();
     this.doLogin = this.doLogin.bind(this);
     this.state = {
-      loading: false
+      loading: false,
+      error: ""
     };
   }
 
@@ -36,7 +30,11 @@ export class Login extends React.Component {
         user => console.log("Login Success ", user),
         error => {
           console.log(error);
-          this.setState({ loading: false });
+          this.setState({
+            loading: false,
+            error:
+              "The password is invalid or the user does not have a password."
+          });
         }
       );
     // this.setState({ loading: false });
@@ -68,7 +66,28 @@ export class Login extends React.Component {
     if (this.state.loading) {
       body = <ActivityIndicator />;
     }
-    return <View style={styles.container}>{body}</View>;
+    return (
+      <>
+        <View style={styles.container}>{body}</View>
+        <Snackbar
+          visible={!!this.state.error}
+          duration={5000}
+          action={{
+            label: "Dismiss",
+            onPress: () => {
+              this.state.error = "";
+              this.setState(this.state);
+            }
+          }}
+          onDismiss={() => {
+            this.state.error = "";
+            this.setState(this.state);
+          }}
+        >
+          {this.state.error}
+        </Snackbar>
+      </>
+    );
   }
 }
 const styles = StyleSheet.create({

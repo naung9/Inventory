@@ -142,7 +142,7 @@ export default class ItemDetail extends React.Component {
         if (response.didCancel) {
           console.log("Cancelled");
         } else if (response.error) {
-          alert("An Error Occured : ", response.error);
+          console.log("An Error Occured : ", response.error);
         } else {
           console.log(response.uri);
           this.setState({
@@ -193,6 +193,7 @@ export default class ItemDetail extends React.Component {
               this.setState(this.state);
             },
             error => {
+              console.log(error);
               this.state.loading = false;
               this.setState(this.state);
             }
@@ -215,7 +216,7 @@ export default class ItemDetail extends React.Component {
     );
   }
 
-  onSelectItemChange(value, ref, another) {
+  onSelectItemChange(value /*, ref, another*/) {
     this.state.pickedValue = value;
     this.setState(this.state);
   }
@@ -235,6 +236,7 @@ export default class ItemDetail extends React.Component {
         this.setState(this.state);
       },
       error => {
+        console.log(error);
         this.state.loading = false;
         this.setState(this.state);
       }

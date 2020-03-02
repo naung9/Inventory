@@ -1,15 +1,6 @@
 import React from "react";
-import { StyleSheet, View, Image, Linking, Share } from "react-native";
-import {
-  Card,
-  TouchableRipple,
-  Divider,
-  Text,
-  Button,
-  Paragraph,
-  Title,
-  Menu
-} from "react-native-paper";
+import { StyleSheet, View, Image, Linking } from "react-native";
+import { Card, Divider, Text, Button, Menu } from "react-native-paper";
 
 export default class ItemListItem extends React.Component {
   constructor(props) {
@@ -18,7 +9,7 @@ export default class ItemListItem extends React.Component {
     this.state = { imageUrl: "", menuVisible: false };
     this.hideMenu = this.hideMenu.bind(this);
     this.user = props.user.storeUser;
-    this.disabledStatuses = ["rented", "lost", "pending"];
+    // this.disabledStatuses = ["rented", "lost", "pending"];
   }
 
   componentDidMount(): void {
@@ -43,8 +34,8 @@ export default class ItemListItem extends React.Component {
             subtitle={`Owner : ${this.props.item.currentOwner.name}, Type : ${
               this.props.item.type
             }`}
-            left={props => <Text>{"Qty : " + this.props.item.quantity}</Text>}
-            right={props => (
+            left={() => <Text>{"Qty : " + this.props.item.quantity}</Text>}
+            right={() => (
               <Image
                 source={
                   this.state.imageUrl === ""

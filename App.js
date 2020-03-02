@@ -9,19 +9,19 @@ import "react-native-gesture-handler";
 import React, { Component } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { Platform } from "react-native";
-import { Login } from "./components/login";
+import { Login } from "./src/components/login";
 import auth from "@react-native-firebase/auth";
-import { Home } from "./components/home";
+import { Home } from "./src/components/home";
 import {
   Provider as PaperProvider,
   ActivityIndicator
 } from "react-native-paper";
-import { FireStoreService } from "./services/FireStoreService";
+import { FireStoreService } from "./src/services/FireStoreService";
 import { createStackNavigator } from "@react-navigation/stack";
 import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
-import { Register } from "./components/register";
-import messaging from "@react-native-firebase/messaging";
+import { Register } from "./src/components/register";
+// import messaging from "@react-native-firebase/messaging";
 
 // TODO(you): import any additional firebase services that you require for your app, e.g for auth:
 //    1) install the npm package: `yarn add @react-native-firebase/auth@alpha` - you do not need to
@@ -56,16 +56,17 @@ export default class App extends Component<Props> {
     this.fireStore = firestore();
     this.storageService = new FireStoreService(this.fireStore);
     this.fileStore = storage();
-    this.messaging = messaging();
+    // this.messaging = messaging();
   }
   componentDidMount(): void {
-    if (Platform.OS === "ios")
-      this.messaging
-        .registerForRemoteNotifications()
-        .then(token => console.log(token));
-    this.messaging
-      .getToken()
-      .then(token => console.log(token), error => console.log(error));
+    // *************     Notification And Cloud Messaging Modules to be Integrated Later On    ***********
+    // if (Platform.OS === "ios")
+    //   this.messaging
+    //     .registerForRemoteNotifications()
+    //     .then(token => console.log(token));
+    // this.messaging
+    //   .getToken()
+    //   .then(token => console.log(token), error => console.log(error));
     console.log("App Started");
     this.authUnSubscriber = this.auth.onAuthStateChanged(user => {
       console.log("Auth State Changed", user);
@@ -84,17 +85,18 @@ export default class App extends Component<Props> {
               if (usr !== null) {
                 usr.id = snapshot.docs[0].id;
                 console.log(usr);
-                this.messaging.getToken().then(token => {
-                  if (usr.token === undefined || usr.token !== token) {
-                    usr.token = token;
-                    this.props.storageService
-                      .saveItem("users", usr)
-                      .then(
-                        () => console.log("Token updated"),
-                        error => console.log(error)
-                      );
-                  }
-                });
+                // **********   Getting Token For User's Device Later When Messaging and Notification Is Integrated  *********
+                // this.messaging.getToken().then(token => {
+                //   if (usr.token === undefined || usr.token !== token) {
+                //     usr.token = token;
+                //     this.props.storageService
+                //       .saveItem("users", usr)
+                //       .then(
+                //         () => console.log("Token updated"),
+                //         error => console.log(error)
+                //       );
+                //   }
+                // });
                 this.setState({
                   user: { authUser: user, storeUser: usr },
                   loading: false
@@ -121,10 +123,11 @@ export default class App extends Component<Props> {
         <NavigationContainer>
           {this.state.user ? (
             <Home
+              auth={this.auth}
               storageService={this.storageService}
               fileStore={this.fileStore}
               user={this.state.user}
-              messaging={this.messaging}
+              //messaging={this.messaging}
             />
           ) : (
             <Stack.Navigator

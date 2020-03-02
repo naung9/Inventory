@@ -1,5 +1,3 @@
-import {Pagination} from './Pagination';
-
 export class FireStoreService {
   _fireStore;
   collections = {};
@@ -26,7 +24,7 @@ export class FireStoreService {
     return this.collections[itemType];
   }
 
-  async getAllItems(itemType, pagination?: Pagination) {
+  async getAllItems(itemType) {
     return await this.getCollection(itemType);
   }
   async getItemById(itemType, id) {
@@ -47,5 +45,5 @@ export class FireStoreService {
       .doc(id)
       .delete();
   }
-  async searchItems(itemType, searchParams, pagination?: Pagination) {}
+  async searchItems(itemType, searchParams) {}
 }

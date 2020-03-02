@@ -4,7 +4,7 @@ import ItemDetail from "./item-detail";
 import ItemDetailAction from "./item-detail-action";
 import UserProfile from "./user-profile";
 import MyHeader from "./header";
-import firebase from "@react-native-firebase/app";
+// import firebase from "@react-native-firebase/app";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
@@ -14,35 +14,12 @@ export class Home extends React.Component {
   }
 
   componentDidMount(): void {
-    this.props.messaging
-      .requestPermission()
-      .then(result => console.log("Request Permission :", result));
-    // this.createNotificationListeners().then(
-    //   result => console.log(result),
-    //   error => console.log(error)
-    // );
+    // this.props.messaging
+    //   .requestPermission()
+    //   .then(result => console.log("Request Permission :", result));
   }
 
   componentWillUnmount(): void {}
-
-  async createNotificationListeners() {
-    this.notificationListener = firebase
-      .notifications()
-      .onNotification(notification => {
-        const { title, body } = notification;
-        console.log(title, body);
-      });
-
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened(notificationOpen => {
-        const { title, body } = notificationOpen.notification;
-        console.log(title, body);
-      });
-  }
 
   render() {
     return (
