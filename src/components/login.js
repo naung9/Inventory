@@ -41,7 +41,7 @@ export class Login extends React.Component {
   }
   render() {
     let body = (
-      <View>
+      <View style={styles.loginForm}>
         <OutlinedTextField
           label="Email"
           placeholder="Email"
@@ -94,9 +94,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    margin: 15,
-    marginTop: Platform.select({ ios: 8, android: 32 }),
     // alignItems: "center",
     backgroundColor: "#F5FCFF"
+  },
+  loginForm: {
+    margin: 15
   }
 });

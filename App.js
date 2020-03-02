@@ -79,7 +79,6 @@ export default class App extends Component<Props> {
           .get()
           .then(
             snapshot => {
-              console.log(snapshot);
               let usr =
                 snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
               if (usr !== null) {
@@ -101,6 +100,10 @@ export default class App extends Component<Props> {
                   user: { authUser: user, storeUser: usr },
                   loading: false
                 });
+              } else {
+                console.log("Unexpected Error");
+                this.state.loading = false;
+                this.setState(this.state);
               }
             },
             error => this.setState({ user: null, loading: false })

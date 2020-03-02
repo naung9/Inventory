@@ -81,7 +81,8 @@ export class Register extends React.Component {
   }
 
   onObjectChange(property, value) {
-    this.state.registerUser[property] = value;
+    this.state.registerUser[property] =
+      property === "email" ? value.toLowerCase() : value;
     this.setState(this.state);
   }
   onTextChange(property, value) {
