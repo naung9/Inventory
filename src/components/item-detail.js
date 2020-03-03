@@ -39,6 +39,7 @@ export default class ItemDetail extends React.Component {
     this.pickImage = this.pickImage.bind(this);
     this.onSelectItemChange = this.onSelectItemChange.bind(this);
     this.checkNewItem = this.checkNewItem.bind(this);
+    this.initializeListener = this.initializeListener.bind(this);
     this.state = {
       imageUrl: "",
       item: this.item,
@@ -51,22 +52,8 @@ export default class ItemDetail extends React.Component {
 
   componentDidMount(): void {
     this.unSubscriber = () => {};
-    if (this.item !== null) {
-      this.unSubscriber = this.storageService
-        .getCollection("item_requests")
-        .where("itemId", "==", this.item.id)
-        .onSnapshot(snapshot => {
-          if (snapshot !== null) {
-            let data = [];
-            snapshot.forEach(doc => {
-              let request = doc.data();
-              request.id = doc.id;
-              data.push(request);
-            });
-            this.state.itemRequests = data;
-            this.setState(this.state);
-          }
-        });
+    if (this.state.item !== null) {
+      this.initializeListener();
       this.imageStoreRef = this.fileStore.ref("items/" + this.item.imageName);
       this.imageStoreRef.getDownloadURL().then(
         value => {
@@ -101,6 +88,25 @@ export default class ItemDetail extends React.Component {
         }
       );
     }
+  }
+
+  initializeListener() {
+    console.log("Initializing Listeners");
+    this.unSubscriber = this.storageService
+      .getCollection("item_requests")
+      .where("itemId", "==", this.state.item.id)
+      .onSnapshot(snapshot => {
+        if (snapshot !== null) {
+          let data = [];
+          snapshot.forEach(doc => {
+            let request = doc.data();
+            request.id = doc.id;
+            data.push(request);
+          });
+          this.state.itemRequests = data;
+          this.setState(this.state);
+        }
+      });
   }
 
   componentWillUnmount(): void {
@@ -191,6 +197,7 @@ export default class ItemDetail extends React.Component {
               this.state.loading = false;
               this.state.updated = false;
               this.setState(this.state);
+              if (this.unSubscriber !== undefined) this.initializeListener();
             },
             error => {
               console.log(error);
@@ -364,17 +371,28 @@ export default class ItemDetail extends React.Component {
             <Picker.Item label={"Lost"} value={"lost"} />
           </Picker>
           <View style={styles.buttonRow}>
+            {this.checkNewItem() ? (
+              <Button mode="contained" icon={"check"} onPress={this.add}>
+                {"Add"}
+              </Button>
+            ) : (
+              <>
+                <Button mode="contained" icon={"check"} onPress={this.update}>
+                  {"Save"}
+                </Button>
+                <Button
+                  mode="contained"
+                  color={"red"}
+                  icon={"close"}
+                  onPress={this.delete}
+                >
+                  {"Delete"}
+                </Button>
+              </>
+            )}
             <Button
-              mode="contained"
-              icon={"check"}
-              onPress={this.checkNewItem() ? this.add : this.update}
-            >
-              {this.checkNewItem() ? "Add" : "Save"}
-            </Button>
-            <Button
-              mode="contained"
+              mode="outlined"
               icon={"cancel"}
-              color={"red"}
               onPress={this.props.navigation.goBack}
             >
               {"Cancel"}

@@ -46,6 +46,7 @@ export class Login extends React.Component {
           label="Email"
           placeholder="Email"
           keyboardType={"email-address"}
+          autoCapitalize="none"
           ref={this.emailRef}
           returnKeyType={"next"}
         />

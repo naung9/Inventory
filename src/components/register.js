@@ -19,6 +19,7 @@ export class Register extends React.Component {
       },
       password: "",
       confirmPassword: "",
+      accessKey: "",
       rejected: "",
       loading: false
     };
@@ -36,44 +37,80 @@ export class Register extends React.Component {
       this.setState(this.state);
       return;
     }
-    this.auth
-      .createUserWithEmailAndPassword(
-        this.state.registerUser.email,
-        this.state.password
-      )
+    if (this.state.accessKey === null || this.state.accessKey === "") {
+      this.state.rejected =
+        "Access key is required to create account. Ask one from your superiors.";
+      this.state.loading = false;
+      this.setState(this.state);
+      return;
+    }
+    this.storageService
+      .getCollection("accesskeys")
+      .where("key", "==", this.state.accessKey)
+      .get()
       .then(
-        user => {
-          this.storageService.addItem("users", this.state.registerUser).then(
-            () => {
-              this.auth
-                .signInWithEmailAndPassword(
-                  this.state.registerUser.email,
-                  this.state.password
-                )
-                .then(
-                  loggedInUser => {
-                    console.log("Login Success ", loggedInUser);
-                  },
-                  error => {
-                    console.log(error);
-                    this.state.rejected = error;
-                    this.state.loading = false;
-                    this.setState(this.state);
-                    this.props.navigation.navigate("Login");
-                  }
-                );
-            },
-            error => {
-              console.log(error);
-              this.state.rejected = error;
-              this.state.loading = false;
-              this.setState(this.state);
-            }
-          );
+        snapshot => {
+          let key = snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
+          if (key !== null) {
+            console.log(key);
+            this.auth
+              .createUserWithEmailAndPassword(
+                this.state.registerUser.email,
+                this.state.password
+              )
+              .then(
+                user => {
+                  console.log("Created User :", user);
+                  let saveUser = this.state.registerUser;
+                  saveUser.organization = key.organization;
+                  this.storageService.addItem("users", saveUser).then(
+                    () => {
+                      this.auth
+                        .signInWithEmailAndPassword(
+                          this.state.registerUser.email,
+                          this.state.password
+                        )
+                        .then(
+                          loggedInUser => {
+                            console.log("Login Success ", loggedInUser);
+                            // this.state.loading = false;
+                            // this.setState(this.state);
+                          },
+                          error => {
+                            console.log(error);
+                            this.state.rejected = error;
+                            this.state.loading = false;
+                            this.setState(this.state);
+                            this.props.navigation.navigate("Login");
+                          }
+                        );
+                    },
+                    error => {
+                      console.log(error);
+                      this.state.rejected = error;
+                      this.state.loading = false;
+                      this.setState(this.state);
+                    }
+                  );
+                },
+                error => {
+                  console.log(error);
+                  this.state.rejected = error;
+                  this.state.loading = false;
+                  this.setState(this.state);
+                }
+              );
+          } else {
+            console.log("Unexpected read error");
+            this.state.rejected = "Error accessing to server please try again.";
+            this.state.loading = false;
+            this.setState(this.state);
+          }
         },
         error => {
           console.log(error);
-          this.state.rejected = error;
+          this.state.rejected =
+            "Access key is not valid. Ask one from your superiors.";
           this.state.loading = false;
           this.setState(this.state);
         }
@@ -106,6 +143,7 @@ export class Register extends React.Component {
             <OutlinedTextField
               label="Email"
               placeholder="Email"
+              autoCapitalize="none"
               value={this.state.registerUser.email}
               keyboardType={"email-address"}
               onChangeText={value => this.onObjectChange("email", value)}
@@ -117,6 +155,14 @@ export class Register extends React.Component {
               value={this.state.registerUser.phoneNo}
               keyboardType={"phone-pad"}
               onChangeText={value => this.onObjectChange("phoneNo", value)}
+              returnKeyType={"next"}
+            />
+            <OutlinedTextField
+              label="Access Key"
+              placeholder="Access Key"
+              autoCapitalize="none"
+              value={this.state.accessKey}
+              onChangeText={value => this.onTextChange("accessKey", value)}
               returnKeyType={"next"}
             />
             <OutlinedTextField

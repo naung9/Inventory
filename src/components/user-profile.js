@@ -63,8 +63,11 @@ export default class UserProfile extends React.Component {
       );
     return (
       <Card style={cardStyle}>
+        <Card.Title
+          title={"Email : " + this.props.user.storeUser.email}
+          subtitle={"Organization : " + this.props.user.storeUser.organization}
+        />
         <Card.Content>
-          <Title>{this.props.user.storeUser.email}</Title>
           <OutlinedTextField
             label="Name"
             value={this.state.name}

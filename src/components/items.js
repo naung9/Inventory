@@ -12,6 +12,11 @@ export default class Items extends React.Component {
   componentDidMount(): void {
     this.unsubscriber = this.props.storageService
       .getCollection("items")
+      .where(
+        "currentOwner.organization",
+        "==",
+        this.props.user.storeUser.organization
+      )
       .onSnapshot(snapshot => {
         if (snapshot !== null) {
           let data = [];
