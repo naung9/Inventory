@@ -30,10 +30,18 @@ Hobby project that use React Native and Google Firebase for simple Inventory tra
 ## Installation (Available Only For Android)
 - Download and Install InventoryManagement.apk
 
-## Build your own
+## Want to Build your own ?
 1. Clone this repo
 2. CD to cloned directory
 3. Run ```npm install```
+
+### Want to use your own Firebase project?
+1. Add android application with android package name `com.naung9.inventory` in your Firebase project.
+2. Add ios application with ios bundle name `com.naung9.inventory` in your Firebase project.
+3. Download GoogleService-Info.plist and google-services.json from your firebase project
+4. Skip the `Add Firebase SDK` and `Add Initialization Code` parts.
+5. Replace {cloned_directory}/android/app/google-services.json file with your downloaded file.
+6. Replace {cloned_directory}/ios/GoogleService-Info.plist with your downloaded file.
 
 ### Build Android
 #### PreRequisites
