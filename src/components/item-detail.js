@@ -428,8 +428,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   image: {
-    flexWrap: "wrap",
-    minHeight: 200,
+    height: 200,
     minWidth: 200,
     borderColor: "black",
     borderRadius: 2,

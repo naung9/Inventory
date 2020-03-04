@@ -69,7 +69,7 @@ export default class Items extends React.Component {
         <FAB
           style={styles.fab}
           icon={"plus"}
-          onPress={() => this.props.navigation.navigate("ItemDetail")}
+          onPress={() => this.props.navigation.navigate("Item Detail")}
         />
       </>
     );

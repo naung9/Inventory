@@ -34,7 +34,7 @@ export default class MyHeader extends React.Component {
         ) : (
           <></>
         )}
-        <Appbar.Content title={"Inventory List"} />
+        <Appbar.Content title={this.scene.route.name} />
         <Menu
           onDismiss={this.onMenuDismiss}
           visible={this.state.showMenu}
@@ -51,7 +51,15 @@ export default class MyHeader extends React.Component {
             title={"My Profile"}
             onPress={() => {
               this.onMenuDismiss();
-              this.navigation.navigate("UserProfile");
+              this.navigation.navigate("Profile");
+            }}
+          />
+          <Menu.Item
+            icon={"history"}
+            title={"My History"}
+            onPress={() => {
+              this.onMenuDismiss();
+              this.navigation.navigate("To Do");
             }}
           />
           <Menu.Item icon="logout" title="Log Out" onPress={this.logOut} />

@@ -24,16 +24,16 @@ export class FireStoreService {
     return this.collections[itemType];
   }
 
-  async getAllItems(itemType) {
-    return await this.getCollection(itemType);
+  getAllItems(itemType) {
+    return this.getCollection(itemType);
   }
-  async getItemById(itemType, id) {
-    return await this.getCollection(itemType)
+  getItemById(itemType, id) {
+    return this.getCollection(itemType)
       .doc(id)
       .get();
   }
-  async addItem(itemType, item) {
-    return await this.getCollection(itemType).add(item);
+  addItem(itemType, item) {
+    return this.getCollection(itemType).add(item);
   }
   saveItem(itemType, item) {
     return this.getCollection(itemType)

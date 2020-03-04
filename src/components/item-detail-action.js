@@ -10,6 +10,8 @@ import {
 } from "react-native-paper";
 import firestore from "@react-native-firebase/firestore";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
+import formatDateTime from "../services/formatDateTime";
+import FireStoreImage from "./FireStoreImage";
 
 export default class ItemDetailAction extends React.Component {
   constructor(props) {
@@ -74,18 +76,18 @@ export default class ItemDetailAction extends React.Component {
           this.setState(this.state);
         }
       });
-    this.imageStoreRef = this.fileStore.ref("items/" + this.item.imageName);
-    this.imageStoreRef.getDownloadURL().then(
-      value => {
-        this.state.imageUrl = value;
-        this.setState(this.state);
-      },
-      error => {
-        console.log(error);
-        this.state.loading = false;
-        this.setState(this.state);
-      }
-    );
+    // this.imageStoreRef = this.fileStore.ref("items/" + this.item.imageName);
+    // this.imageStoreRef.getDownloadURL().then(
+    //   value => {
+    //     this.state.imageUrl = value;
+    //     this.setState(this.state);
+    //   },
+    //   error => {
+    //     console.log(error);
+    //     this.state.loading = false;
+    //     this.setState(this.state);
+    //   }
+    // );
   }
 
   componentWillUnmount(): void {
@@ -195,19 +197,6 @@ export default class ItemDetailAction extends React.Component {
     this.saveRequest(itemRequest);
   }
 
-  formatDateTime(dateTime) {
-    let year = dateTime.getFullYear() + "";
-    let month = dateTime.getMonth() + 1 + "";
-    let date = dateTime.getDate() + "";
-    let hour = dateTime.getHours() + "";
-    let minutes = dateTime.getMinutes() + "";
-    month.length === 1 && (month = "0" + month);
-    date.length === 1 && (date = "0" + date);
-    hour.length === 1 && (hour = "0" + hour);
-    minutes.length === 1 && (minutes = "0" + minutes);
-    return year + "-" + month + "-" + date + " " + hour + ":" + minutes;
-  }
-
   render() {
     let itemRequestViews = [];
     this.state.itemRequests.forEach(request => {
@@ -221,10 +210,8 @@ export default class ItemDetailAction extends React.Component {
               <Card.Title
                 title={
                   request.returnStatus !== null
-                    ? `Return At ${this.formatDateTime(
-                        request.returnDate.toDate()
-                      )}`
-                    : `Request At ${this.formatDateTime(
+                    ? `Return At ${formatDateTime(request.returnDate.toDate())}`
+                    : `Request At ${formatDateTime(
                         request.requestDate.toDate()
                       )}`
                 }
@@ -276,17 +263,11 @@ export default class ItemDetailAction extends React.Component {
           ) : (
             <>
               <View style={styles.content}>
-                {this.state.imageUrl === "" ? (
-                  <View style={styles.image}>
-                    <Text>Image Is Loading</Text>
-                  </View>
-                ) : (
-                  <Image
-                    source={{ uri: this.state.imageUrl }}
-                    style={styles.image}
-                    loadingIndicatorSource={<ActivityIndicator />}
-                  />
-                )}
+                <FireStoreImage
+                  style={styles.image}
+                  fileStore={this.fileStore}
+                  imageName={this.item.imageName}
+                />
                 <Text>{"Item Name : " + this.item.name}</Text>
                 <Text>{"Item Type : " + this.item.type}</Text>
                 <Text>
@@ -374,7 +355,6 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   image: {
-    flexWrap: "wrap",
     height: 200,
     minWidth: 200,
     borderColor: "black",

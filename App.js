@@ -21,7 +21,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import { Register } from "./src/components/register";
-// import messaging from "@react-native-firebase/messaging";
+import messaging from "@react-native-firebase/messaging";
 
 // TODO(you): import any additional firebase services that you require for your app, e.g for auth:
 //    1) install the npm package: `yarn add @react-native-firebase/auth@alpha` - you do not need to
@@ -56,58 +56,47 @@ export default class App extends Component<Props> {
     this.fireStore = firestore();
     this.storageService = new FireStoreService(this.fireStore);
     this.fileStore = storage();
-    // this.messaging = messaging();
+    this.messaging = messaging();
   }
   componentDidMount(): void {
     // *************     Notification And Cloud Messaging Modules to be Integrated Later On    ***********
-    // if (Platform.OS === "ios")
-    //   this.messaging
-    //     .registerForRemoteNotifications()
-    //     .then(token => console.log(token));
-    // this.messaging
-    //   .getToken()
-    //   .then(token => console.log(token), error => console.log(error));
+    this.messaging
+      .registerForRemoteNotifications()
+      .then(token => console.log(token), error => console.error(error));
     console.log("App Started");
-    this.authUnSubscriber = this.auth.onAuthStateChanged(user => {
+    this.authUnSubscriber = this.auth.onAuthStateChanged(async user => {
       console.log("Auth State Changed", user);
       this.state.loading = true;
       this.setState(this.state);
       if (user !== null) {
-        this.storageService
-          .getCollection("users")
-          .where("email", "==", user.email)
-          .get()
-          .then(
-            snapshot => {
-              let usr =
-                snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
-              if (usr !== null) {
-                usr.id = snapshot.docs[0].id;
-                console.log(usr);
-                // **********   Getting Token For User's Device Later When Messaging and Notification Is Integrated  *********
-                // this.messaging.getToken().then(token => {
-                //   if (usr.token === undefined || usr.token !== token) {
-                //     usr.token = token;
-                //     this.props.storageService
-                //       .saveItem("users", usr)
-                //       .then(
-                //         () => console.log("Token updated"),
-                //         error => console.log(error)
-                //       );
-                //   }
-                // });
-                this.setState({
-                  user: { authUser: user, storeUser: usr },
-                  loading: false
-                });
-              } else {
-                console.log("Unexpected Error");
-                this.state.loading = false;
-                this.setState(this.state);
-              }
-            },
-            error => this.setState({ user: null, loading: false })
-          );
+        try {
+          let snapshot = await this.storageService
+            .getCollection("users")
+            .where("email", "==", user.email)
+            .get();
+          let usr = snapshot.docs.length > 0 ? snapshot.docs[0].data() : null;
+          if (usr !== null) {
+            usr.id = snapshot.docs[0].id;
+            const token = await this.messaging.getToken();
+            console.log("Token", token);
+            if (usr.token === undefined || usr.token !== token) {
+              usr.token = token;
+              await this.storageService.saveItem("users", usr);
+            }
+            console.log(usr);
+            this.setState({
+              user: { authUser: user, storeUser: usr },
+              loading: false
+            });
+          } else {
+            console.error("Unexpected Error");
+            this.state.loading = false;
+            this.setState(this.state);
+          }
+        } catch (error) {
+          console.error(error);
+          this.setState({ user: null, loading: false });
+        }
       } else {
         this.setState({ user: null, loading: false });
       }
@@ -130,7 +119,7 @@ export default class App extends Component<Props> {
               storageService={this.storageService}
               fileStore={this.fileStore}
               user={this.state.user}
-              //messaging={this.messaging}
+              messaging={this.messaging}
             />
           ) : (
             <Stack.Navigator

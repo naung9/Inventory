@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View, Image, Linking } from "react-native";
 import { Card, Divider, Text, Button, Menu } from "react-native-paper";
+import FireStoreImage from "./FireStoreImage";
 
 export default class ItemListItem extends React.Component {
   constructor(props) {
@@ -10,15 +11,6 @@ export default class ItemListItem extends React.Component {
     this.hideMenu = this.hideMenu.bind(this);
     this.user = props.user.storeUser;
     // this.disabledStatuses = ["rented", "lost", "pending"];
-  }
-
-  componentDidMount(): void {
-    this.fileStore
-      .ref("items/" + this.props.item.imageName)
-      .getDownloadURL()
-      .then(url =>
-        this.setState({ imageUrl: url, menuVisible: this.state.menuVisible })
-      );
   }
 
   hideMenu() {
@@ -36,30 +28,14 @@ export default class ItemListItem extends React.Component {
             }`}
             left={() => <Text>{"Qty : " + this.props.item.quantity}</Text>}
             right={() => (
-              <Image
-                source={
-                  this.state.imageUrl === ""
-                    ? null
-                    : { uri: this.state.imageUrl }
-                }
+              <FireStoreImage
                 style={styles.imageStyle}
+                fileStore={this.fileStore}
+                imageName={this.props.item.imageName}
               />
             )}
           />
           <Card.Actions styles={styles.cardFooter}>
-            {/*{this.props.item.currentOwner.email !== this.user.email &&*/}
-            {/*this.disabledStatuses.indexOf(this.props.item.status) === -1 ? (*/}
-            {/*  <>*/}
-            {/*    <Button onPress={()=>{*/}
-            {/*      Share.share({*/}
-            {/*        message: `Item : ${this.props.item.name}\n, Quantity: 1`*/}
-            {/*      })*/}
-            {/*    }}>Share</Button>*/}
-            {/*    <View style={styles.verticalDivider} />*/}
-            {/*  </>*/}
-            {/*) : (*/}
-            {/*  <></>*/}
-            {/*)}*/}
             {this.props.item.currentOwner.email !== this.user.email ? (
               <>
                 <Menu
@@ -116,12 +92,12 @@ export default class ItemListItem extends React.Component {
             <Button
               onPress={() => {
                 if (this.user.email === this.props.item.currentOwner.email)
-                  this.props.navigation.navigate("ItemDetail", {
+                  this.props.navigation.navigate("Item Detail", {
                     item: this.props.item
                     // storageService: this.props.storageService
                   });
                 else {
-                  this.props.navigation.navigate("ItemDetailAction", {
+                  this.props.navigation.navigate("Item Detail Action", {
                     item: this.props.item
                     // storageService: this.props.storageService
                   });
