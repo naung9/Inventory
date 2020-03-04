@@ -24,7 +24,6 @@ Hobby project that use React Native and Google Firebase for simple Inventory tra
 - [x] Adding, Editing your inventory items
 - [x] Search other people's belongings and request for rent if you need
 - [x] Approve/Deny to people's requests for your items
-- [ ] Item rent history. (Not Yet Implemented)
 - [ ] Notifications. (Not yet Implemented. See [Issue](https://github.com/naung9/Inventory/issues/1)
 
 ## Installation (Available Only For Android)
