@@ -42,6 +42,32 @@ Hobby project that use React Native and Google Firebase for simple Inventory tra
 4. Skip the `Add Firebase SDK` and `Add Initialization Code` parts.
 5. Replace {cloned_directory}/android/app/google-services.json file with your downloaded file.
 6. Replace {cloned_directory}/ios/GoogleService-Info.plist with your downloaded file.
+7. Set up "Sign In Method" with "Email/Password" type.
+8. Create database in Cloud Firestore.
+9. Update Cloud Firestore database rule with following
+```
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	match /accesskeys/{keys} {
+    	allow read: if true;
+    }
+    match /{document=**} {
+      allow read, write: if request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+  }
+}
+```
+10. Create a new collection in Cloud Firestore Database with ID "accesskeys" and add a new document to it with following fields.
+```
+Field = key
+Type = string
+Value = {A_KeyCode_of_your_choice_random_recommended}
+
+Field = organization
+Type = string
+Value = {Organization_Name_Of_Your_Choice_E.G ISGM}
+```
+11. Set UP Firebase Cloud Storage with Default options or OPTIONS of your choice.
 
 ### Build Android
 #### PreRequisites
