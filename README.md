@@ -27,7 +27,7 @@ Hobby project that use React Native and Google Firebase for simple Inventory tra
 - [ ] Notifications. (Not yet Implemented. See [Issue](https://github.com/naung9/Inventory/issues/1)
 
 ## Installation (Available Only For Android)
-- Download and Install InventoryManagement.apk
+- Download and Install [InventoryManagement.apk](https://github.com/naung9/Inventory/releases/download/V-0.0.1-beta/InventoryManagement-v-0.0.1-beta.apk)
 
 ## Want to Build your own ?
 1. Clone this repo
